@@ -83,6 +83,8 @@ class FlaxUNet2DConditionModel(nn.Module, FlaxModelMixin, ConfigMixin):
             The dimension of the attention heads.
         num_attention_heads (`int` or `Tuple[int]`, *optional*):
             The number of attention heads.
+        resnet_time_scale_shift (`str`, *optional*, defaults to `"default"`): Time scale shift config
+            for ResNet blocks (see [`~models.resnet_flax.FlaxResnetBlock2D`]). Choose from `default` or `scale_shift`.
         cross_attention_dim (`int`, *optional*, defaults to 768):
             The dimension of the cross attention features.
         dropout (`float`, *optional*, defaults to 0):
@@ -116,6 +118,7 @@ class FlaxUNet2DConditionModel(nn.Module, FlaxModelMixin, ConfigMixin):
     flip_sin_to_cos: bool = True
     freq_shift: int = 0
     use_memory_efficient_attention: bool = False
+    resnet_time_scale_shift: str = "default"
 
     def init_weights(self, rng: jax.random.KeyArray) -> FrozenDict:
         # init input tensors
@@ -183,6 +186,7 @@ class FlaxUNet2DConditionModel(nn.Module, FlaxModelMixin, ConfigMixin):
                     dropout=self.dropout,
                     num_layers=self.layers_per_block,
                     num_attention_heads=num_attention_heads[i],
+                    resnet_time_scale_shift=self.resnet_time_scale_shift,
                     add_downsample=not is_final_block,
                     use_linear_projection=self.use_linear_projection,
                     only_cross_attention=only_cross_attention[i],
@@ -193,6 +197,7 @@ class FlaxUNet2DConditionModel(nn.Module, FlaxModelMixin, ConfigMixin):
                 down_block = FlaxDownBlock2D(
                     in_channels=input_channel,
                     out_channels=output_channel,
+                    resnet_time_scale_shift=self.resnet_time_scale_shift,
                     dropout=self.dropout,
                     num_layers=self.layers_per_block,
                     add_downsample=not is_final_block,
@@ -207,6 +212,7 @@ class FlaxUNet2DConditionModel(nn.Module, FlaxModelMixin, ConfigMixin):
             in_channels=block_out_channels[-1],
             dropout=self.dropout,
             num_attention_heads=num_attention_heads[-1],
+            resnet_time_scale_shift=self.resnet_time_scale_shift,
             use_linear_projection=self.use_linear_projection,
             use_memory_efficient_attention=self.use_memory_efficient_attention,
             dtype=self.dtype,
@@ -232,6 +238,7 @@ class FlaxUNet2DConditionModel(nn.Module, FlaxModelMixin, ConfigMixin):
                     prev_output_channel=prev_output_channel,
                     num_layers=self.layers_per_block + 1,
                     num_attention_heads=reversed_num_attention_heads[i],
+                    resnet_time_scale_shift=self.resnet_time_scale_shift,
                     add_upsample=not is_final_block,
                     dropout=self.dropout,
                     use_linear_projection=self.use_linear_projection,
@@ -245,6 +252,7 @@ class FlaxUNet2DConditionModel(nn.Module, FlaxModelMixin, ConfigMixin):
                     out_channels=output_channel,
                     prev_output_channel=prev_output_channel,
                     num_layers=self.layers_per_block + 1,
+                    resnet_time_scale_shift=self.resnet_time_scale_shift,
                     add_upsample=not is_final_block,
                     dropout=self.dropout,
                     dtype=self.dtype,
