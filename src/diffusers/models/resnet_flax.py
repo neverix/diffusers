@@ -116,7 +116,7 @@ class FlaxResnetBlock2D(nn.Module):
         temb = self.time_emb_proj(nn.swish(temb))
         temb = jnp.expand_dims(jnp.expand_dims(temb, 1), 1)
         if self.time_embedding_norm == "scale_shift":
-            scale, shift = jnp.split(temb, 2, axis=1)
+            scale, shift = jnp.split(temb, 2, axis=3)
             hidden_states = hidden_states * (1 + scale) + shift
         else:
             hidden_states = hidden_states + temb
