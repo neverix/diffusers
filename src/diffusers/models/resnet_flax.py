@@ -66,6 +66,7 @@ class FlaxResnetBlock2D(nn.Module):
     dropout_prob: float = 0.0
     use_nin_shortcut: bool = None
     dtype: jnp.dtype = jnp.float32
+    time_embedding_norm: str = "default"
 
     def setup(self):
         out_channels = self.in_channels if self.out_channels is None else self.out_channels
@@ -79,7 +80,10 @@ class FlaxResnetBlock2D(nn.Module):
             dtype=self.dtype,
         )
 
-        self.time_emb_proj = nn.Dense(out_channels, dtype=self.dtype)
+        
+        self.time_emb_proj = nn.Dense(out_channels
+                                      * (2 if self.time_embedding_norm == "scale_shift" else 1),
+                                      dtype=self.dtype)
 
         self.norm2 = nn.GroupNorm(num_groups=32, epsilon=1e-5)
         self.dropout = nn.Dropout(self.dropout_prob)
@@ -111,7 +115,11 @@ class FlaxResnetBlock2D(nn.Module):
 
         temb = self.time_emb_proj(nn.swish(temb))
         temb = jnp.expand_dims(jnp.expand_dims(temb, 1), 1)
-        hidden_states = hidden_states + temb
+        if self.time_embedding_norm == "scale_shift":
+            scale, shift = jnp.split(temb, 2, axis=1)
+            hidden_states = hidden_states * (1 + scale) + shift
+        else:
+            hidden_states = hidden_states + temb
 
         hidden_states = self.norm2(hidden_states)
         hidden_states = nn.swish(hidden_states)
