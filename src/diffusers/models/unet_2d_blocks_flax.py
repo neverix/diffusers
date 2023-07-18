@@ -35,6 +35,8 @@ class FlaxCrossAttnDownBlock2D(nn.Module):
             Number of attention blocks layers
         num_attention_heads (:obj:`int`, *optional*, defaults to 1):
             Number of attention heads of each spatial transformer block
+        resnet_time_scale_shift (`str`, *optional*, defaults to `"default"`): Time scale shift config
+            for ResNet blocks (see [`~models.resnet_flax.FlaxResnetBlock2D`]). Choose from `default` or `scale_shift`.
         add_downsample (:obj:`bool`, *optional*, defaults to `True`):
             Whether to add downsampling layer before each final output
         use_memory_efficient_attention (`bool`, *optional*, defaults to `False`):
@@ -48,6 +50,7 @@ class FlaxCrossAttnDownBlock2D(nn.Module):
     num_layers: int = 1
     num_attention_heads: int = 1
     add_downsample: bool = True
+    resnet_time_scale_shift: str = "default"
     use_linear_projection: bool = False
     only_cross_attention: bool = False
     use_memory_efficient_attention: bool = False
@@ -63,6 +66,7 @@ class FlaxCrossAttnDownBlock2D(nn.Module):
             res_block = FlaxResnetBlock2D(
                 in_channels=in_channels,
                 out_channels=self.out_channels,
+                time_embedding_norm=self.resnet_time_scale_shift,
                 dropout_prob=self.dropout,
                 dtype=self.dtype,
             )
@@ -114,6 +118,8 @@ class FlaxDownBlock2D(nn.Module):
             Dropout rate
         num_layers (:obj:`int`, *optional*, defaults to 1):
             Number of attention blocks layers
+        resnet_time_scale_shift (`str`, *optional*, defaults to `"default"`): Time scale shift config
+            for ResNet blocks (see [`~models.resnet_flax.FlaxResnetBlock2D`]). Choose from `default` or `scale_shift`.
         add_downsample (:obj:`bool`, *optional*, defaults to `True`):
             Whether to add downsampling layer before each final output
         dtype (:obj:`jnp.dtype`, *optional*, defaults to jnp.float32):
@@ -123,6 +129,7 @@ class FlaxDownBlock2D(nn.Module):
     out_channels: int
     dropout: float = 0.0
     num_layers: int = 1
+    resnet_time_scale_shift: str = "default"
     add_downsample: bool = True
     dtype: jnp.dtype = jnp.float32
 
@@ -135,6 +142,7 @@ class FlaxDownBlock2D(nn.Module):
             res_block = FlaxResnetBlock2D(
                 in_channels=in_channels,
                 out_channels=self.out_channels,
+                time_embedding_norm=self.resnet_time_scale_shift,
                 dropout_prob=self.dropout,
                 dtype=self.dtype,
             )
@@ -174,6 +182,8 @@ class FlaxCrossAttnUpBlock2D(nn.Module):
             Number of attention blocks layers
         num_attention_heads (:obj:`int`, *optional*, defaults to 1):
             Number of attention heads of each spatial transformer block
+        resnet_time_scale_shift (`str`, *optional*, defaults to `"default"`): Time scale shift config
+            for ResNet blocks (see [`~models.resnet_flax.FlaxResnetBlock2D`]). Choose from `default` or `scale_shift`.
         add_upsample (:obj:`bool`, *optional*, defaults to `True`):
             Whether to add upsampling layer before each final output
         use_memory_efficient_attention (`bool`, *optional*, defaults to `False`):
@@ -188,6 +198,7 @@ class FlaxCrossAttnUpBlock2D(nn.Module):
     num_layers: int = 1
     num_attention_heads: int = 1
     add_upsample: bool = True
+    resnet_time_scale_shift: str = "default"
     use_linear_projection: bool = False
     only_cross_attention: bool = False
     use_memory_efficient_attention: bool = False
@@ -204,6 +215,7 @@ class FlaxCrossAttnUpBlock2D(nn.Module):
             res_block = FlaxResnetBlock2D(
                 in_channels=resnet_in_channels + res_skip_channels,
                 out_channels=self.out_channels,
+                time_embedding_norm=resnet_time_scale_shift,
                 dropout_prob=self.dropout,
                 dtype=self.dtype,
             )
@@ -258,6 +270,8 @@ class FlaxUpBlock2D(nn.Module):
             Dropout rate
         num_layers (:obj:`int`, *optional*, defaults to 1):
             Number of attention blocks layers
+        resnet_time_scale_shift (`str`, *optional*, defaults to `"default"`): Time scale shift config
+            for ResNet blocks (see [`~models.resnet_flax.FlaxResnetBlock2D`]). Choose from `default` or `scale_shift`.
         add_downsample (:obj:`bool`, *optional*, defaults to `True`):
             Whether to add downsampling layer before each final output
         dtype (:obj:`jnp.dtype`, *optional*, defaults to jnp.float32):
@@ -268,6 +282,7 @@ class FlaxUpBlock2D(nn.Module):
     prev_output_channel: int
     dropout: float = 0.0
     num_layers: int = 1
+    resnet_time_scale_shift: str = "default"
     add_upsample: bool = True
     dtype: jnp.dtype = jnp.float32
 
@@ -281,6 +296,7 @@ class FlaxUpBlock2D(nn.Module):
             res_block = FlaxResnetBlock2D(
                 in_channels=resnet_in_channels + res_skip_channels,
                 out_channels=self.out_channels,
+                time_embedding_norm=self.resnet_time_scale_shift,
                 dropout_prob=self.dropout,
                 dtype=self.dtype,
             )
@@ -319,6 +335,8 @@ class FlaxUNetMidBlock2DCrossAttn(nn.Module):
             Number of attention blocks layers
         num_attention_heads (:obj:`int`, *optional*, defaults to 1):
             Number of attention heads of each spatial transformer block
+        resnet_time_scale_shift (`str`, *optional*, defaults to `"default"`): Time scale shift config
+            for ResNet blocks (see [`~models.resnet_flax.FlaxResnetBlock2D`]). Choose from `default` or `scale_shift`.
         use_memory_efficient_attention (`bool`, *optional*, defaults to `False`):
             enable memory efficient attention https://arxiv.org/abs/2112.05682
         dtype (:obj:`jnp.dtype`, *optional*, defaults to jnp.float32):
@@ -328,6 +346,7 @@ class FlaxUNetMidBlock2DCrossAttn(nn.Module):
     dropout: float = 0.0
     num_layers: int = 1
     num_attention_heads: int = 1
+    resnet_time_scale_shift: str = "default"
     use_linear_projection: bool = False
     use_memory_efficient_attention: bool = False
     dtype: jnp.dtype = jnp.float32
@@ -338,6 +357,7 @@ class FlaxUNetMidBlock2DCrossAttn(nn.Module):
             FlaxResnetBlock2D(
                 in_channels=self.in_channels,
                 out_channels=self.in_channels,
+                time_embedding_norm=self.resnet_time_scale_shift,
                 dropout_prob=self.dropout,
                 dtype=self.dtype,
             )
@@ -360,6 +380,7 @@ class FlaxUNetMidBlock2DCrossAttn(nn.Module):
             res_block = FlaxResnetBlock2D(
                 in_channels=self.in_channels,
                 out_channels=self.in_channels,
+                time_embedding_norm=self.resnet_time_scale_shift,
                 dropout_prob=self.dropout,
                 dtype=self.dtype,
             )
