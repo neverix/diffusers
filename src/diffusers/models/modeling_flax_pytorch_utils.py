@@ -87,7 +87,7 @@ def rename_key_and_reshape_tensor(pt_tuple_key, pt_tensor, random_flax_state_dic
     return pt_tuple_key, pt_tensor
 
 
-def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model, init_key=42):
+def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model, init_key=42, dtype=None):
     # Step 1: Convert pytorch tensor to numpy
     pt_state_dict = {k: v.numpy() for k, v in pt_state_dict.items()}
 
@@ -113,6 +113,6 @@ def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model, init_key=42):
                 )
 
         # also add unexpected weight so that warning is thrown
-        flax_state_dict[flax_key] = jnp.asarray(flax_tensor)
+        flax_state_dict[flax_key] = jnp.asarray(flax_tensor, dtype=dtype)
 
     return unflatten_dict(flax_state_dict)
