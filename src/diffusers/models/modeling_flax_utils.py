@@ -414,7 +414,7 @@ class FlaxModelMixin:
             pytorch_model_file = load_state_dict(model_file)
 
             # Step 2: Convert the weights
-            state = convert_pytorch_state_dict_to_flax(pytorch_model_file, model, dtype=dtype)
+            state = convert_pytorch_state_dict_to_flax(pytorch_model_file, model)
         else:
             try:
                 with open(model_file, "rb") as state_f:
