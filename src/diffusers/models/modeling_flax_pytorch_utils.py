@@ -15,6 +15,7 @@
 """ PyTorch - Flax general utilities."""
 import re
 
+from argparse import Namespace
 import jax.numpy as jnp
 from flax.traverse_util import flatten_dict, unflatten_dict
 from jax.random import PRNGKey
@@ -111,8 +112,8 @@ def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model, init_key=42, d
     random_flax_params = flax_model.init_weights(PRNGKey(init_key))
 
     random_flax_state_dict = flatten_dict(random_flax_params)
-    random_flax_state_dict_shapes = {k: v.shape for k, v in random_flax_state_dict.items()}
-    del random_flax_params, random_flax_state_dict
+    del random_flax_params
+    random_flax_state_dict = {k: Namespace(shape=v.shape) for k, v in random_flax_state_dict.items()}
     flax_state_dict = {}
 
     # Need to change some parameters name to match Flax names
@@ -127,10 +128,10 @@ def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model, init_key=42, d
         flax_key, flax_tensor = rename_key_and_reshape_tensor(pt_tuple_key, pt_tensor, random_flax_state_dict)
 
         if flax_key in random_flax_state_dict_shapes:
-            if flax_tensor.shape != random_flax_state_dict_shapes[flax_key].shape:
+            if flax_tensor.shape != random_flax_state_dict[flax_key].shape:
                 raise ValueError(
                     f"PyTorch checkpoint seems to be incorrect. Weight {pt_key} was expected to be of shape "
-                    f"{random_flax_state_dict_shapes[flax_key]}, but is {flax_tensor.shape}."
+                    f"{random_flax_state_dict[flax_key].shape}, but is {flax_tensor.shape}."
                 )
 
         # also add unexpected weight so that warning is thrown
