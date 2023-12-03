@@ -127,7 +127,7 @@ def convert_pytorch_state_dict_to_flax(pt_state_dict, flax_model, init_key=42, d
         # Correctly rename weight parameters
         flax_key, flax_tensor = rename_key_and_reshape_tensor(pt_tuple_key, pt_tensor, random_flax_state_dict)
 
-        if flax_key in random_flax_state_dict_shapes:
+        if flax_key in random_flax_state_dict:
             if flax_tensor.shape != random_flax_state_dict[flax_key].shape:
                 raise ValueError(
                     f"PyTorch checkpoint seems to be incorrect. Weight {pt_key} was expected to be of shape "
