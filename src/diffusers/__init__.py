@@ -1,4 +1,4 @@
-__version__ = "0.25.0.dev0"
+__version__ = "0.26.0.dev0"
 
 from typing import TYPE_CHECKING
 
@@ -94,6 +94,7 @@ else:
             "UNet3DConditionModel",
             "UNetMotionModel",
             "UNetSpatioTemporalConditionModel",
+            "UVit2DModel",
             "VQModel",
         ]
     )
@@ -130,6 +131,7 @@ else:
     )
     _import_structure["schedulers"].extend(
         [
+            "AmusedScheduler",
             "CMStochasticIterativeScheduler",
             "DDIMInverseScheduler",
             "DDIMParallelScheduler",
@@ -201,6 +203,9 @@ else:
         [
             "AltDiffusionImg2ImgPipeline",
             "AltDiffusionPipeline",
+            "AmusedImg2ImgPipeline",
+            "AmusedInpaintPipeline",
+            "AmusedPipeline",
             "AnimateDiffPipeline",
             "AudioLDM2Pipeline",
             "AudioLDM2ProjectionModel",
@@ -311,7 +316,7 @@ except OptionalDependencyNotAvailable:
     ]
 
 else:
-    _import_structure["pipelines"].extend(["StableDiffusionKDiffusionPipeline"])
+    _import_structure["pipelines"].extend(["StableDiffusionKDiffusionPipeline", "StableDiffusionXLKDiffusionPipeline"])
 
 try:
     if not (is_torch_available() and is_transformers_available() and is_onnx_available()):
@@ -468,6 +473,7 @@ if TYPE_CHECKING or DIFFUSERS_SLOW_IMPORT:
             UNet3DConditionModel,
             UNetMotionModel,
             UNetSpatioTemporalConditionModel,
+            UVit2DModel,
             VQModel,
         )
         from .optimization import (
@@ -502,6 +508,7 @@ if TYPE_CHECKING or DIFFUSERS_SLOW_IMPORT:
             ScoreSdeVePipeline,
         )
         from .schedulers import (
+            AmusedScheduler,
             CMStochasticIterativeScheduler,
             DDIMInverseScheduler,
             DDIMParallelScheduler,
@@ -556,6 +563,9 @@ if TYPE_CHECKING or DIFFUSERS_SLOW_IMPORT:
         from .pipelines import (
             AltDiffusionImg2ImgPipeline,
             AltDiffusionPipeline,
+            AmusedImg2ImgPipeline,
+            AmusedInpaintPipeline,
+            AmusedPipeline,
             AnimateDiffPipeline,
             AudioLDM2Pipeline,
             AudioLDM2ProjectionModel,
@@ -658,7 +668,7 @@ if TYPE_CHECKING or DIFFUSERS_SLOW_IMPORT:
     except OptionalDependencyNotAvailable:
         from .utils.dummy_torch_and_transformers_and_k_diffusion_objects import *  # noqa F403
     else:
-        from .pipelines import StableDiffusionKDiffusionPipeline
+        from .pipelines import StableDiffusionKDiffusionPipeline, StableDiffusionXLKDiffusionPipeline
 
     try:
         if not (is_torch_available() and is_transformers_available() and is_onnx_available()):
